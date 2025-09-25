@@ -9,7 +9,6 @@ import soundfile as sf
 import numpy as np
 import tkinter as tk
 
-from tkinter import ttk
 from collections import OrderedDict
 
 HARMONIC_FREQUENCIES = [277.18, 311.13, 369.99, 415.30, 466.16, 554.37, 622.25, 739.99, 830.61]
@@ -32,7 +31,7 @@ class App():
 
     def __init__(self, root, *args, **kwargs):
         self.root = root
-        self.style = ttk.Style()
+        #self.style = ttk.Style()
 
         self.event_queue = []
         self.scenario_frames = {}
@@ -49,11 +48,11 @@ class App():
 
         self.root.title("Study Testing Application")
         self.root.geometry('500x300')
-        self.style.configure('.', font=('Helvetica', self.font_size), bg='black')
+        #self.style.configure('.', font=('Helvetica', self.font_size), bg='black')
 
         # The swappable_frame_base is always scaled to be a max size 1:1 square
         # Used as the parent for all "pages" of the application
-        self.swappable_frame_base = ttk.Frame(root)
+        self.swappable_frame_base = tk.Frame(root)
         self.swappable_frame_base.columnconfigure(0, weight=1)
         self.swappable_frame_base.rowconfigure(0, weight=1)
 
@@ -63,16 +62,16 @@ class App():
                                       orient=tk.HORIZONTAL, tickinterval=0, showvalue=0)
 
         self.participant_id = None
-        self.participant_id_entry = ttk.Entry(entry_screen_frame)
-        participant_id_label = ttk.Label(entry_screen_frame, 
+        self.participant_id_entry = tk.Entry(entry_screen_frame)
+        participant_id_label = tk.Label(entry_screen_frame, 
                                          text="Participant ID:")
 
         test_audio = self.create_beep_audio(HARMONIC_FREQUENCIES[4], AUDIO_SAMPLE_RATE)
         callback = lambda _: self.play_audio(test_audio) 
-        test_audio_button = ttk.Button(entry_screen_frame, text="Test Sound")
+        test_audio_button = tk.Button(entry_screen_frame, text="Test Sound")
         test_audio_button.bind('<Button-1>', callback)
 
-        entry_next_button = ttk.Button(entry_screen_frame, text="Start Test")
+        entry_next_button = tk.Button(entry_screen_frame, text="Start Test")
         def start_if_viable(_):
             if self.participant_id_entry.get() and self.volume_slider.get():
                 self.participant_id = self.participant_id_entry.get()
@@ -93,7 +92,7 @@ class App():
 
         # --- END PAGE INITIALIZATION ---
         thank_you_screen_frame = self.create_swappable_frame()
-        text = ttk.Label(thank_you_screen_frame, text="Thank you\nfor participating")
+        text = tk.Label(thank_you_screen_frame, text="Thank you\nfor participating")
         text.pack()
         self.scenario_frames['last'] = thank_you_screen_frame
         # --- END PAGE INITIALIZATION ---
@@ -119,7 +118,7 @@ class App():
         if new_font_size != self.font_size:
             self.font_size = new_font_size
             new_font = ("Helvetica", self.font_size)
-            self.style.configure('.', font=("Helvetica", self.font_size))
+            #self.style.configure('.', font=("Helvetica", self.font_size))
             self.participant_id_entry.config(font=new_font)
 
         square_sidelength = min(width, height)
@@ -129,7 +128,7 @@ class App():
 
 
     def create_swappable_frame(self):
-        frame = ttk.Frame(self.swappable_frame_base)
+        frame = tk.Frame(self.swappable_frame_base)
         frame.grid(row=0, column=0, sticky='nwse')
         frame.grid_remove()
         return frame
@@ -158,11 +157,11 @@ class App():
             self.effect_callback[scenario_name][i] = effect_callback
             callback = self.on_trial_button_press(i, sounds[i], scenario_name)
 
-            button = ttk.Frame(scenario_frame, style=f'{scenario_name}{i}.TFrame')
+            button = tk.Frame(scenario_frame, bg='blue')#style=f'{scenario_name}{i}.TFrame')
             button.bind('<Button-1>', callback)
             button.grid(row = i//3, column = i%3, sticky='nwse', padx=2, pady=2)
 
-            self.style.configure(f'{scenario_name}{i}.TFrame', background='blue')
+            #self.style.configure(f'{scenario_name}{i}.TFrame', background='blue')
             button.grid_remove()
 
             scenario_frame.columnconfigure(i%3, weight=1)
@@ -171,10 +170,10 @@ class App():
             self.special_widgets[scenario_name][i] = button
 
 
-        scenario_label = ttk.Label(scenario_frame)
+        scenario_label = tk.Label(scenario_frame)
         scenario_label.grid(row=0, column=1)
         self.special_widgets[scenario_name]['scenario-label'] = scenario_label
-        next_button = ttk.Button(scenario_frame, text="Ready?")
+        next_button = tk.Button(scenario_frame, text="Ready?")
         next_button.grid(row=1, column=1, sticky='nwse')
         next_button.bind('<Button-1>', self.on_next_button_press(scenario_name))
         self.special_widgets[scenario_name]['next'] = next_button
@@ -275,10 +274,13 @@ class App():
         """
         def callback(*_):
             self.play_audio(data)
-            self.style.configure(f'{scenario_name}{button_index}.TFrame', background='orange')
+            #self.style.configure(f'{scenario_name}{button_index}.TFrame', background='orange')
 
+            self.special_widgets[scenario_name][button_index].config(bg='orange')
             def turn_to_blue(*_):
-                self.style.configure(f'{scenario_name}{button_index}.TFrame', background='blue')
+                pass
+                self.special_widgets[scenario_name][button_index].config(bg='blue')
+                #self.style.configure(f'{scenario_name}{button_index}.TFrame', background='blue')
             self.run_after(ATTACK_LENGTH_MS+HOLD_LENGTH_MS, turn_to_blue)
         return callback
 
