@@ -11,8 +11,8 @@ import tkinter as tk
 
 from collections import OrderedDict
 
-HARMONIC_FREQUENCIES = [277.18, 311.13, 369.99, 415.30, 466.16, 554.37, 622.25, 739.99, 830.61]
-UNRELATED_FREQUENCIES = [270, 310, 360, 410, 460, 550, 620, 730, 830] # CHANGE THESE
+HARMONIC_FREQUENCIES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99]
+UNRELATED_FREQUENCIES = [227, 317, 354, 407, 463, 539, 569, 747, 823] # EXPLANATION REQUIRED
 AUDIO_SAMPLE_RATE = 48000 
 # The below line should automatically pick the natural sample rate of the device
 # AUDIO_SAMPLE_RATE = sd.query_devices(args.device, 'output')['default_samplerate']
