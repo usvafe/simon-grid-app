@@ -76,6 +76,8 @@ class App():
             if self.participant_id_entry.get() and self.volume_slider.get():
                 self.participant_id = self.participant_id_entry.get()
                 self.results_file = self.get_results_file(f'{self.participant_id}.csv')
+                if self.results_file.exists():
+                    self.load_data()
                 self.start_next_scenario()
 
         entry_next_button.bind('<Button-1>', start_if_viable)
@@ -332,9 +334,10 @@ class App():
     def get_results_file(filename):
         results_dir = App.get_results_folder()
         result_filename = results_dir / filename
-        if result_filename.exists():
-            print(f"Error: file {result_filename.absolute()} already exists.", file=sys.stderr)
-            quit()
+        #if result_filename.exists():
+        #    
+        #    print(f"Error: file {result_filename.absolute()} already exists.", file=sys.stderr)
+        #    quit()
         return result_filename
 
     @staticmethod
@@ -387,6 +390,31 @@ class App():
             results = csv.writer(csvfile)
             for row in data_to_write:
                 results.writerow(row)
+
+    def load_data(self):
+        participant_id = self.participant_id
+        with open(self.results_file, 'r') as csvfile:
+            results = csv.reader(csvfile)
+            lastscen = ''
+            for (_, scenario_name, _, scenario_length, correct) in results:
+                # Don't redo already done scenarios, record which one we were on
+                lastscen = scenario_name
+                if scenario_name in self.randomized_scenario_order:
+                    self.randomized_scenario_order.remove(scenario_name)
+                self.per_scenario_data.setdefault(scenario_name, [])
+                # Spoof "correct" and "incorrect" data of correct length as exact moves not stored
+                right_moves = [0] * int(scenario_length)
+                wrong_moves = [1] * int(scenario_length)
+                if correct == 'True':
+                    self.per_scenario_data[scenario_name].append((right_moves, right_moves))
+                else:
+                    self.per_scenario_data[scenario_name].append((right_moves, wrong_moves))
+
+            # start with scenario in progress
+            self.randomized_scenario_order.insert(0, lastscen)
+
+            print(f"Loaded data for participant {participant_id}\n")
+            print(self.per_scenario_data)
 
 
 
